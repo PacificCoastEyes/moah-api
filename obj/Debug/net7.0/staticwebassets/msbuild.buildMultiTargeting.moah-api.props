@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\moah-api.props" />
-</Project>
