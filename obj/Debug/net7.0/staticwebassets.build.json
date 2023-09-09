@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "diGWges5PWe87p0Gzyaec605PKu1aljGyskVKnk2xuk=",
+  "Source": "moah-api",
+  "BasePath": "_content/moah-api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
