@@ -1,44 +1,31 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 using MongoDB.Driver;
-using MongoDB.Bson;
 using moah_api.Models;
+using moah_api.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-// IConfiguration config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
 var connectionString = builder.Configuration.GetConnectionString("MongoDB");
-MongoClient client = new MongoClient(connectionString);
+MongoClient client = new(connectionString);
 IMongoCollection<User> usersCollection = client.GetDatabase("moah").GetCollection<User>("users");
 
 builder.Services.AddControllers();
+builder.Services.AddLogging(builder => builder.AddConsole());
 builder.Services.AddSingleton(usersCollection);
-// builder.Services.AddAuthentication(options =>
-// {
-//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-// }).AddJwtBearer(bearer =>
-// {
-//     bearer.TokenValidationParameters = new TokenValidationParameters
-//     {
-//         ValidIssuer = builder.Configuration["Jwt:Issuer"],
-//         ValidAudience = builder.Configuration["Jwt:Audience"],
-//         IssuerSigningKey = new SymmetricSecurityKey
-//             (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
-//         ValidateIssuer = true,
-//         ValidateAudience = true,
-//         ValidateLifetime = false,
-//         ValidateIssuerSigningKey = true
-//     };
-// });
-
+builder.Services.AddSingleton(builder.Configuration);
+builder.Services.AddScoped<TokenSigner>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenSecret"]!))
+    };
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -67,7 +54,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
+
+app.UseHttpLogging();
 
 app.MapControllers();
 
