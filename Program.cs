@@ -18,12 +18,15 @@ builder.Services.AddLogging(builder => builder.AddConsole());
 builder.Services.AddSingleton(usersCollection);
 builder.Services.AddSingleton(builder.Configuration);
 builder.Services.AddScoped<TokenSigner>();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+builder.Services.AddScoped<TokenDecryptor>();
+builder.Services.AddAuthentication().AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenSecret"]!))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenSecret"]!)),
+        ValidateIssuer = false,
+        ValidateAudience = false
     };
 });
 

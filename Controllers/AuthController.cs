@@ -3,6 +3,9 @@ using MongoDB.Driver;
 using BC = BCrypt.Net.BCrypt;
 using moah_api.Models;
 using moah_api.Utilities;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace moah_api.Controllers;
 
@@ -12,11 +15,13 @@ public class AuthController : ControllerBase
 {
     private readonly IMongoCollection<User> _usersCollection;
     private readonly TokenSigner _tokenSigner;
+    private readonly TokenDecryptor _tokenDecryptor;
     public readonly ILogger<AuthController> _logger;
-    public AuthController(IMongoCollection<User> usersCollection, TokenSigner tokenSigner, ILogger<AuthController> logger)
+    public AuthController(IMongoCollection<User> usersCollection, TokenSigner tokenSigner, TokenDecryptor tokenDecryptor, ILogger<AuthController> logger)
     {
         _usersCollection = usersCollection;
         _tokenSigner = tokenSigner;
+        _tokenDecryptor = tokenDecryptor;
         _logger = logger;
     }
 
@@ -67,6 +72,24 @@ public class AuthController : ControllerBase
         {
             _logger.LogError(e, "Login error");
             return StatusCode(500, "Sorry, there was an error logging you in, please try again later.");
+        }
+    }
+
+    [Authorize]
+    [HttpGet("validate-token", Name = "ValidateTokenRoute")]
+    public ActionResult ValidateToken()
+    // If reaches this endpoint has already passed JWT validation by authentication middlware
+    {
+        try
+        {
+            string token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+            var payload = _tokenDecryptor.DecryptToken(token);
+            return Ok(new { firstName = payload.FindFirstValue("firstName") });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Login error");
+            return StatusCode(500, "Sorry, there was an error, please try again later.");
         }
     }
 }
