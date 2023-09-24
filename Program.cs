@@ -12,10 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("MongoDB");
 MongoClient client = new(connectionString);
 IMongoCollection<User> usersCollection = client.GetDatabase("moah").GetCollection<User>("users");
+IMongoCollection<JournalEntry> journalEntriesCollection = client.GetDatabase("moah").GetCollection<JournalEntry>("journal_entries");
 
 builder.Services.AddControllers();
 builder.Services.AddLogging(builder => builder.AddConsole());
 builder.Services.AddSingleton(usersCollection);
+builder.Services.AddSingleton(journalEntriesCollection);
 builder.Services.AddSingleton(builder.Configuration);
 builder.Services.AddScoped<TokenSigner>();
 builder.Services.AddScoped<TokenDecryptor>();
