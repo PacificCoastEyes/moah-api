@@ -45,5 +45,28 @@ namespace moah_api.Controllers
                 return StatusCode(500, "Sorry, there was an error logging you in, please try again later.");
             }
         }
+
+        [Authorize]
+        [HttpPatch("save-entry", Name = "SaveEntryRoute")]
+        async public Task<ActionResult> SaveEntry(IncomingUpdatedEntry updatedEntry)
+        {
+            try
+            {
+                string token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+                string userId = _tokenDecryptor.DecryptToken(token).FindFirstValue("id")!;
+
+                FilterDefinitionBuilder<JournalEntry> builder = Builders<JournalEntry>.Filter;
+                FilterDefinition<JournalEntry> filter = builder.And(builder.Eq(document => document.UserId, ObjectId.Parse(userId)), builder.Eq(document => document.Id, ObjectId.Parse(updatedEntry.Id)));
+                UpdateDefinition<JournalEntry> update = Builders<JournalEntry>.Update.Set(document => document.Content, updatedEntry.Content).Set(document => document.Snippet, updatedEntry.Snippet);
+                await _journalEntriesCollection.UpdateOneAsync(filter, update);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Save journal entry error");
+                return StatusCode(500, "Oops! There was an error saving your journal entry, please try again later.");
+            }
+        }
     }
 }
