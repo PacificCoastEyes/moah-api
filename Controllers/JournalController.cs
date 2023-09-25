@@ -29,6 +29,8 @@ namespace moah_api.Controllers
 
         [Authorize]
         [HttpPost("initialize-entry", Name = "InitializeEntryRoute")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         async public Task<ActionResult> InitializeEntry()
         {
             try
@@ -48,6 +50,9 @@ namespace moah_api.Controllers
 
         [Authorize]
         [HttpGet("get-entry-by-id", Name = "GetEntryByIdRoute")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         async public Task<ActionResult> GetEntryById(string id)
         {
             try
@@ -68,6 +73,8 @@ namespace moah_api.Controllers
 
         [Authorize]
         [HttpPatch("save-entry", Name = "SaveEntryRoute")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         async public Task<ActionResult> SaveEntry(IncomingUpdatedEntry updatedEntry)
         {
             try

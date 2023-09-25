@@ -26,6 +26,8 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("signup", Name = "SignupRoute")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     async public Task<ActionResult> Signup(User newUser)
     {
         try
@@ -52,6 +54,9 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login", Name = "LoginRoute")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     async public Task<ActionResult> Login(User user)
     {
         try
@@ -77,6 +82,8 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpGet("validate-token", Name = "ValidateTokenRoute")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public ActionResult ValidateToken()
     // If reaches this endpoint has already passed JWT validation by authentication middlware
     {
