@@ -42,7 +42,27 @@ namespace moah_api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Initialize journal entry error");
-                return StatusCode(500, "Sorry, there was an error logging you in, please try again later.");
+                return StatusCode(500, "Oops! there was an error getting your journal entry started, please try again later.");
+            }
+        }
+
+        [Authorize]
+        [HttpGet("get-entry-by-id", Name = "GetEntryByIdRoute")]
+        async public Task<ActionResult> GetEntryById(string id)
+        {
+            try
+            {
+                string token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+                string userId = _tokenDecryptor.DecryptToken(token).FindFirstValue("id")!;
+                FilterDefinitionBuilder<JournalEntry> builder = Builders<JournalEntry>.Filter;
+                FilterDefinition<JournalEntry> filter = builder.And(builder.Eq(document => document.UserId, ObjectId.Parse(userId)), builder.Eq(document => document.Id, ObjectId.Parse(id)));
+                JournalEntry entry = await _journalEntriesCollection.Find(filter).FirstOrDefaultAsync();
+                return Ok(new { id = entry.Id.ToString(), metadata = entry.Id, content = entry.Content, snippet = entry.Snippet });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Get journal entry by ID error");
+                return e is NullReferenceException ? StatusCode(400, "Hold up! That journal entry doesn't exist.") : StatusCode(500, "Oops! there was an error loading your journal entry, please try again later.");
             }
         }
 
