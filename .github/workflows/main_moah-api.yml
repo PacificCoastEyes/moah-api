@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'moah-api'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9559ACA06DEE4D9A820CBDF4F41E7477 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D933081E22F24A4B86B9BE574D26553D }}
           package: .
