@@ -39,8 +39,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy
-        .AllowAnyOrigin()
+        policy.WithOrigins("https://brave-water-053e78e03.3.azurestaticapps.net/", "localhost:3000")
         .AllowAnyHeader()
         .AllowAnyMethod();
     });
