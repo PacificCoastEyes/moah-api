@@ -11,4 +11,5 @@ public class JournalEntry
     public required ObjectId UserId { get; set; }
     [BsonElement("content")]
     public string? Content { get; set; }
+    public string? Snippet { get; set; }
 }

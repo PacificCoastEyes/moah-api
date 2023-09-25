@@ -28,7 +28,7 @@ namespace moah_api.Controllers
         }
 
         [Authorize]
-        [HttpGet("initialize-entry", Name = "InitializeEntryRoute")]
+        [HttpPost("initialize-entry", Name = "InitializeEntryRoute")]
         async public Task<ActionResult> InitializeEntry()
         {
             try
